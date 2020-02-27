@@ -22,6 +22,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
 
+    //test somthing
+    if(0)
+    {
+        DcmFileFormat fm;
+        fm.loadFile("E:\\0-dicomFile\\errorDicom\\46160666.dcm");
+        EditDicom::saveDcmFile(fm, "E:\\0-dicomFile\\errorDicom\\46160666-decode2.dcm");
+    }
+
     //hide toolbar
     {
         ui->mainToolBar->hide();

@@ -33,6 +33,8 @@
 #include <dcmtk/dcmjpeg/djdecode.h>
 #include "dcmtk/dcmjpeg/djencode.h"
 #include "dcmtk/dcmjpeg/djrplol.h"
+#include "dcmtk/dcmdata/dcrledrg.h" //for DcmRLEDecoderRegistration
+
 
 //*******************************************std includes******************************************//
 #include <QString>
