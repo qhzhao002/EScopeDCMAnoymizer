@@ -450,6 +450,8 @@ bool EditDicom::editToNewDir(QString sNewDir)
             //E_TransferSyntax xfer = pDs->getOriginalXfer();
             //dcm.chooseRepresentation(xfer, nullptr);
             //cond = dcm.saveFile(sNewFullName.toStdString().c_str(), xfer);
+
+            //always save it as little endia
             cond = saveDcmFile(dcm,sNewFullName);
 
             if(cond.bad() == true)
