@@ -54,10 +54,15 @@ private:
     void getAllTag(DcmDataset* pDs, vector<DcmObject *> &v);
 
     int editTag(vector<DcmObject *> &v, TAGVALUE &tag, QString *sErrorMsg);
-
+/*
     int getChildESTag(DcmDataset* pDs, EDCMOBJ* pESObj);
     int deleteDcmObj(DcmDataset* pDs, DcmObject* pDcmObj);
+*/
     int deleteTag(DcmDataset* pDs, vector<DcmObject *> &v, TAGVALUE &tag, QString *sErrorMsg);
+
+public:
+    static OFCondition saveDcmFile(DcmFileFormat &fm, QString sFileName);
+
 public:
 
     vector <QString> m_vectFile;

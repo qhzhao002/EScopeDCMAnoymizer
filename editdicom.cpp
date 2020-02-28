@@ -115,7 +115,7 @@ int EditDicom::editTag(vector<DcmObject *> &v, TAGVALUE &tag, QString *sErrorMsg
 
     return nRet;
 }
-
+/*
 int EditDicom::getChildESTag(DcmDataset *pDs, EDCMOBJ *pESObj)
 {
     if(!pESObj)
@@ -175,7 +175,7 @@ int EditDicom::deleteDcmObj(DcmDataset *pDs, DcmObject *pDcmObj)
 
     return 0;
 }
-
+*/
 int EditDicom::deleteTag(DcmDataset *pDs, vector<DcmObject *> &v, TAGVALUE &tag, QString *sErrorMsg)
 {
     int nRet = 0;
@@ -195,6 +195,37 @@ int EditDicom::deleteTag(DcmDataset *pDs, vector<DcmObject *> &v, TAGVALUE &tag,
     }
 
     return nRet;
+}
+
+OFCondition EditDicom::saveDcmFile(DcmFileFormat &fm, QString sFileName)
+{
+    DcmDataset * pDataset = fm.getDataset();
+    E_TransferSyntax xfer = pDataset->getOriginalXfer();
+    const char* transferSyntax = NULL;
+    fm.getMetaInfo()->findAndGetString(DCM_TransferSyntaxUID, transferSyntax);
+    string losslessTransUID = "1.2.840.10008.1.2.4.70";
+    string lossTransUID = "1.2.840.10008.1.2.4.51";
+    string losslessP14 = "1.2.840.10008.1.2.4.57";
+    string lossyP1 = "1.2.840.10008.1.2.4.50";
+    string lossyRLE = "1.2.840.10008.1.2.5";
+    if (transferSyntax == losslessTransUID || transferSyntax == lossTransUID || transferSyntax == losslessP14 || transferSyntax == lossyP1)
+    {
+        DJDecoderRegistration::registerCodecs();
+        pDataset->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+    }
+    else if (transferSyntax == lossyRLE)
+    {
+        DcmRLEDecoderRegistration::registerCodecs();
+        pDataset->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+    }
+    else
+    {
+        pDataset->chooseRepresentation(xfer, NULL);
+    }
+
+    //save
+
+    return fm.saveFile(sFileName.toStdString().c_str(), EXS_LittleEndianExplicit);
 }
 
 int EditDicom::editDicomInfo(DcmDataset* pDs, vector<TAGVALUE> &tagList, QString *sErrorMsg)
@@ -416,9 +447,12 @@ bool EditDicom::editToNewDir(QString sNewDir)
             }
 
 
-            E_TransferSyntax xfer = pDs->getOriginalXfer();
-            dcm.chooseRepresentation(xfer, nullptr);
-            cond = dcm.saveFile(sNewFullName.toStdString().c_str(), xfer);
+            //E_TransferSyntax xfer = pDs->getOriginalXfer();
+            //dcm.chooseRepresentation(xfer, nullptr);
+            //cond = dcm.saveFile(sNewFullName.toStdString().c_str(), xfer);
+
+            //always save it as little endia
+            cond = saveDcmFile(dcm,sNewFullName);
 
             if(cond.bad() == true)
             {
@@ -514,9 +548,11 @@ bool EditDicom::editToOldDir()
                     break;
                 }
 
-                E_TransferSyntax xfer = pDs->getOriginalXfer();
-                dcm.chooseRepresentation(xfer, nullptr);
-                cond = dcm.saveFile(sTmpFullName.toStdString().c_str(), xfer);
+                //E_TransferSyntax xfer = pDs->getOriginalXfer();
+                //dcm.chooseRepresentation(xfer, nullptr);
+                //cond = dcm.saveFile(sTmpFullName.toStdString().c_str(), xfer);
+                cond = saveDcmFile(dcm, sTmpFullName);
+
                 if(cond.bad() == true)
                 {
                     bError = true;
